@@ -57,6 +57,8 @@ class Ui_MainWindow(object):
 
         main_window.closeEvent = self.close_event
 
+    def update_page_label(self):
+        self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
