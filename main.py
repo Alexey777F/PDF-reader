@@ -65,6 +65,26 @@ class Ui_MainWindow(object):
             shutil.rmtree(self.dir_name)
         event.accept()
 
+    def open_file_dialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
+        if file_path:
+            if not os.path.exists(self.dir_name):
+                os.mkdir(self.dir_name)
+            with fitz.open(file_path) as doc:
+                self.total_pages = len(doc)
+                for i in range(len(doc)):
+                    page = doc.load_page(i)
+                    pix = page.get_pixmap(dpi=110)
+                    output = f"outfile_{i + 1}.png"
+                    pix.save(os.path.join(self.dir_name, output))
+                time.sleep(1)
+            self.show_image(f"{self.dir_name}/outfile_1.png")
+            self.current_page = 0
+            self.update_page_label()
+            self.image_loaded = True
+
     def show_previous_page(self):
         if self.image_loaded:
             if self.total_pages == 1:
