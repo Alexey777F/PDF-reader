@@ -6,6 +6,8 @@ from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 import fitz
 import os
 import shutil
+import requests
+
 
 class Ui_MainWindow(object):
     def setup_ui(self, main_window):
@@ -50,7 +52,7 @@ class Ui_MainWindow(object):
         self.button_forward.clicked.connect(self.show_next_page)
         self.start_pos = None
         self.end_pos = None
-        self.dir_name = "photo"
+        # self.dir_name = "photo"
 
         self.imgBrowser.mousePressEvent = self.mouse_press
         self.imgBrowser.mouseReleaseEvent = self.mouse_release
@@ -61,8 +63,8 @@ class Ui_MainWindow(object):
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 
     def close_event(self, event):
-        if os.path.exists(self.dir_name):
-            shutil.rmtree(self.dir_name)
+        # if os.path.exists(self.dir_name):
+        #     shutil.rmtree(self.dir_name)
         event.accept()
 
     def open_file_dialog(self):
@@ -70,20 +72,27 @@ class Ui_MainWindow(object):
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
         if file_path:
-            if not os.path.exists(self.dir_name):
-                os.mkdir(self.dir_name)
-            with fitz.open(file_path) as doc:
-                self.total_pages = len(doc)
-                for i in range(len(doc)):
-                    page = doc.load_page(i)
-                    pix = page.get_pixmap(dpi=110)
-                    output = f"outfile_{i + 1}.png"
-                    pix.save(os.path.join(self.dir_name, output))
-                time.sleep(1)
-            self.show_image(f"{self.dir_name}/outfile_1.png")
-            self.current_page = 0
-            self.update_page_label()
-            self.image_loaded = True
+            url = 'https://127.0.0.1:9990/add_file'
+            with open(file_path, 'rb') as fp:
+                files = {'file': fp}
+                requests.post(url, files=files)
+
+        # Логика получения 1й страницы
+        # if file_path:
+        #     if not os.path.exists(self.dir_name):
+        #         os.mkdir(self.dir_name)
+        #     with fitz.open(file_path) as doc:
+        #         self.total_pages = len(doc)
+        #         for i in range(len(doc)):
+        #             page = doc.load_page(i)
+        #             pix = page.get_pixmap(dpi=110)
+        #             output = f"outfile_{i + 1}.png"
+        #             pix.save(os.path.join(self.dir_name, output))
+        #         time.sleep(1)
+        #     self.show_image(f"{self.dir_name}/outfile_1.png")
+        #     self.current_page = 0
+        #     self.update_page_label()
+        #     self.image_loaded = True
 
     def show_previous_page(self):
         if self.image_loaded:
