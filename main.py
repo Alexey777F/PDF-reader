@@ -93,6 +93,32 @@ class Ui_MainWindow(object):
         pixmap = QPixmap(image_path)
         self.imgBrowser.setPixmap(pixmap)
         self.scrollArea.ensureVisible(0, 0)
+
+    def retranslate_ui(self, main_window):
+        _translate = QCoreApplication.translate
+        main_window.setWindowTitle(_translate("MainWindow", "PDF Reader"))
+
+    def mouse_press(self, event):
+        if self.image_loaded:
+            if event.button() == Qt.LeftButton:
+                self.start_pos = event.pos()
+                self.end_pos = event.pos()
+
+    def mouse_release(self, event):
+        if self.image_loaded:
+            if event.button() == Qt.RightButton:
+                self.end_pos = event.pos()
+                self.draw_rectangle()
+
+    def draw_rectangle(self):
+        if self.start_pos and self.end_pos:
+            painter = QPainter(self.imgBrowser.pixmap())
+            painter.setPen(QPen(QColor("red"), 4))
+            painter.drawRect(self.start_pos.x(), self.start_pos.y(), self.end_pos.x() - self.start_pos.x(),
+                             self.end_pos.y() - self.start_pos.y())
+            painter.end()
+            self.imgBrowser.update()
+
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
