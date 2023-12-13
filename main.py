@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
         if file_path:
-            url = 'https://127.0.0.1:9990/add_file'
+            url = 'http://127.0.0.1:9990/add_file'
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
                 requests.post(url, files=files)
