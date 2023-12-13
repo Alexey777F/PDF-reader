@@ -59,6 +59,40 @@ class Ui_MainWindow(object):
 
     def update_page_label(self):
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
+
+    def close_event(self, event):
+        if os.path.exists(self.dir_name):
+            shutil.rmtree(self.dir_name)
+        event.accept()
+
+    def show_previous_page(self):
+        if self.image_loaded:
+            if self.total_pages == 1:
+                self.current_page = 0
+            else:
+                if self.current_page == 0:
+                    self.current_page = self.total_pages - 1
+                else:
+                    self.current_page -= 1
+            self.show_image(f"{self.dir_name}/outfile_{self.current_page + 1}.png")
+            self.update_page_label()
+
+    def show_next_page(self):
+        if self.image_loaded:
+            if self.total_pages == 1:
+                self.current_page = 0
+            else:
+                if self.current_page == self.total_pages - 1:
+                    self.current_page = 0
+                else:
+                    self.current_page += 1
+            self.show_image(f"{self.dir_name}/outfile_{self.current_page + 1}.png")
+            self.update_page_label()
+
+    def show_image(self, image_path):
+        pixmap = QPixmap(image_path)
+        self.imgBrowser.setPixmap(pixmap)
+        self.scrollArea.ensureVisible(0, 0)
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
