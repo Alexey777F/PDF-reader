@@ -67,12 +67,27 @@ class Ui_MainWindow(object):
         elif option == "Сохранить страницу как текст":
             self.save_page_as_text()
 
+    def request_url(self, router, method, **kwargs):
+        url = os.path.join(self.server_socket, router)
+        if method == 'get':
+            response = requests.get(url)
+        elif method == 'post':
+            files = kwargs.pop('files', None)
+            response = requests.post(url, files=files)
+            print(url, files)
+        elif method == 'delete':
+            response = requests.delete(url)
+        else:
+            raise ValueError('Unsupported method')
+        if response.status_code == 200:
+            return response
+        else:
+            print(f'Error {method} {router}: {response.status_code}')
+            return None
 
     def close_event(self, event):
         try:
-            method = 'delete_files'
-            url = os.path.join(self.server_socket, method)
-            requests.delete(url)
+            self.request_url('delete_files', 'delete')
         except ConnectionError as ex:
             return f"Ошибка подключения к серверу, {ex}"
         event.accept()
@@ -82,19 +97,28 @@ class Ui_MainWindow(object):
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
         if file_path:
-            method = 'add_file'
-            url = os.path.join(self.server_socket, method)
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
                 try:
-                    requests.post(url, files=files)
+                    self.request_url('add_file', 'post', files=files)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
+                time.sleep(2)
             # Запрос к серверу на 1-ю картинку
-            self.show_image(f"{self.dir_name}/outfile_1.png")
-            self.current_page = 0  # обновляем количество страниц
-            self.update_page_label()  #обновляем лейбл
-            self.image_loaded = True # устанавливаем флаг что файл загружен
+                try:
+                    response = self.request_url('send_images', 'get')
+                    images = response.json()['images']
+                    return images
+                except ConnectionError as ex:
+                    return f"Ошибка подключения к серверу, {ex}"
+
+            #
+            # images = response.json()['images']
+            # print('open_file_dialog', images)
+            # self.show_image(f"{self.dir_name}/outfile_1.png")
+            # self.current_page = 0  # обновляем количество страниц
+            # self.update_page_label()  #обновляем лейбл
+            # self.image_loaded = True # устанавливаем флаг что файл загружен
 
     def save_page_as_image(self):
         pass
