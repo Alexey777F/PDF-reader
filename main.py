@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog,
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 import requests
-
+import os
 
 class Ui_MainWindow(object):
     def setup_ui(self, main_window):
@@ -42,6 +42,7 @@ class Ui_MainWindow(object):
 
         self.button_load.clicked.connect(self.open_file_dialog)
 
+        self.server_socket = 'http://127.0.0.1:9990'
         self.current_page = 0
         self.total_pages = 0
         self.image_loaded = False
@@ -62,7 +63,8 @@ class Ui_MainWindow(object):
     def close_event(self, event):
         # Логика - послать на сервер запрос чтобы удалить файлы ан сервере
         try:
-            url = 'http://127.0.0.1:9990/delete_files'
+            method = 'delete_files'
+            url = os.path.join(self.server_socket, method)
             requests.delete(url)
         except ConnectionError as ex:
             return f"Ошибка подключения к серверу, {ex}"
@@ -73,7 +75,8 @@ class Ui_MainWindow(object):
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
         if file_path:
-            url = 'http://127.0.0.1:9990/add_file'
+            method = 'add_file'
+            url = os.path.join(self.server_socket, method)
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
                 try:
