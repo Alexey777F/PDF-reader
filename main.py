@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import time
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog, QWidget, QLabel, QScrollArea
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog, QWidget, QLabel, QScrollArea, QComboBox
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 import requests
@@ -13,13 +13,12 @@ class Ui_MainWindow(object):
         self.centralwidget = QWidget(main_window)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.button_load = QPushButton(self.centralwidget)
-        self.button_load.setGeometry(10, 10, 140, 35)
-        self.button_load.setText("Открыть файл")
-
-        self.button_page = QPushButton(self.centralwidget)
-        self.button_page.setGeometry(160, 10, 180, 35)
-        self.button_page.setText("Сохранить страницу")
+        self.menu_button = QComboBox(self.centralwidget)
+        self.menu_button.setGeometry(10, 10, 140, 35)
+        self.menu_button.addItem("Меню")
+        self.menu_button.addItem("Открыть файл")
+        self.menu_button.addItem("Сохранить страницу как картинку")
+        self.menu_button.addItem("Сохранить страницу как текст")
 
         self.page_label = QLabel(self.centralwidget)
         self.page_label.setGeometry(400, 10, 120, 35)
@@ -40,7 +39,7 @@ class Ui_MainWindow(object):
         main_window.setCentralWidget(self.centralwidget)
         self.retranslate_ui(main_window)
 
-        self.button_load.clicked.connect(self.open_file_dialog)
+        self.menu_button.activated[str].connect(self.handle_menu_option)
 
         self.server_socket = 'http://127.0.0.1:9990'
         self.current_page = 0
@@ -60,8 +59,16 @@ class Ui_MainWindow(object):
     def update_page_label(self):
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 
+    def handle_menu_option(self, option):
+        if option == "Открыть файл":
+            self.open_file_dialog()
+        elif option == "Сохранить страницу как картинку":
+            self.save_page_as_image()
+        elif option == "Сохранить страницу как текст":
+            self.save_page_as_text()
+
+
     def close_event(self, event):
-        # Логика - послать на сервер запрос чтобы удалить файлы ан сервере
         try:
             method = 'delete_files'
             url = os.path.join(self.server_socket, method)
@@ -83,15 +90,17 @@ class Ui_MainWindow(object):
                     requests.post(url, files=files)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
+            # Запрос к серверу на 1-ю картинку
+            self.show_image(f"{self.dir_name}/outfile_1.png")
+            self.current_page = 0  # обновляем количество страниц
+            self.update_page_label()  #обновляем лейбл
+            self.image_loaded = True # устанавливаем флаг что файл загружен
 
-            # здесь логика получения первой картинки
+    def save_page_as_image(self):
+        pass
 
-            # self.show_image(f"{self.dir_name}/outfile_1.png")
-            # self.current_page = 0  # обновляем количество страниц
-            # self.update_page_label()  #обновляем лейбл
-            # self.image_loaded = True # устанавливаем флаг что файл загружен
-
-
+    def save_page_as_text(self):
+        pass
 
     def show_previous_page(self):
         if self.image_loaded:
