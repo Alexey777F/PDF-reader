@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request, redirect, url_for, jsonify
 import os
 import fitz
 import shutil
@@ -8,7 +8,6 @@ class ServerBack():
         self.app = Flask(__name__)
         self.dir_name = "photos"
         self.total_pages = 0
-
 
     def convert_to_image(self):
         if os.path.exists(self.dir_name):
@@ -21,6 +20,9 @@ class ServerBack():
                     output = f'outfile_{i + 1}.png'
                     pix.save(os.path.join(self.dir_name, output))
 
+    def send_files_to_client(self):
+        if os.path.exists(self.dir_name):
+            pass
 
 create_app = ServerBack()
 app = create_app.app
@@ -38,6 +40,14 @@ def upload_file():
         file.save(os.path.join(dir_name, 'uploaded_file.pdf'))
         create_app.convert_to_image()
         return redirect(url_for('success_uploaded'))
+
+
+@app.route('/send_images', methods=['GET'])
+def send_image():
+    if os.path.exists(dir_name):
+        images = [f'{dir_name}/outfile_{i + 1}' for i in range(create_app.total_pages)]
+        return jsonify({'images': images})
+
 
 @app.route('/delete_files', methods=['DELETE', 'GET'])
 def delete_files():
