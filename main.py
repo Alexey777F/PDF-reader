@@ -3,9 +3,6 @@ import time
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog, QWidget, QLabel, QScrollArea
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
-import fitz
-import os
-import shutil
 import requests
 
 
@@ -52,7 +49,7 @@ class Ui_MainWindow(object):
         self.button_forward.clicked.connect(self.show_next_page)
         self.start_pos = None
         self.end_pos = None
-        # self.dir_name = "photo"
+
 
         self.imgBrowser.mousePressEvent = self.mouse_press
         self.imgBrowser.mouseReleaseEvent = self.mouse_release
@@ -63,8 +60,12 @@ class Ui_MainWindow(object):
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 
     def close_event(self, event):
-        # if os.path.exists(self.dir_name):
-        #     shutil.rmtree(self.dir_name)
+        # Логика - послать на сервер запрос чтобы удалить файлы ан сервере
+        try:
+            url = 'http://127.0.0.1:9990/delete_files'
+            requests.delete(url)
+        except ConnectionError as ex:
+            return f"Ошибка подключения к серверу, {ex}"
         event.accept()
 
     def open_file_dialog(self):
@@ -75,24 +76,19 @@ class Ui_MainWindow(object):
             url = 'http://127.0.0.1:9990/add_file'
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
-                requests.post(url, files=files)
+                try:
+                    requests.post(url, files=files)
+                except ConnectionError as ex:
+                    return f"Ошибка подключения к серверу, {ex}"
 
-        # Логика получения 1й страницы
-        # if file_path:
-        #     if not os.path.exists(self.dir_name):
-        #         os.mkdir(self.dir_name)
-        #     with fitz.open(file_path) as doc:
-        #         self.total_pages = len(doc)
-        #         for i in range(len(doc)):
-        #             page = doc.load_page(i)
-        #             pix = page.get_pixmap(dpi=110)
-        #             output = f"outfile_{i + 1}.png"
-        #             pix.save(os.path.join(self.dir_name, output))
-        #         time.sleep(1)
-        #     self.show_image(f"{self.dir_name}/outfile_1.png")
-        #     self.current_page = 0
-        #     self.update_page_label()
-        #     self.image_loaded = True
+            # здесь логика получения первой картинки
+
+            # self.show_image(f"{self.dir_name}/outfile_1.png")
+            # self.current_page = 0  # обновляем количество страниц
+            # self.update_page_label()  #обновляем лейбл
+            # self.image_loaded = True # устанавливаем флаг что файл загружен
+
+
 
     def show_previous_page(self):
         if self.image_loaded:
@@ -147,6 +143,7 @@ class Ui_MainWindow(object):
                              self.end_pos.y() - self.start_pos.y())
             painter.end()
             self.imgBrowser.update()
+
 
 if __name__ == "__main__":
     import sys
