@@ -10,6 +10,7 @@ class ServerBack():
         self.total_pages = 0
 
     def convert_to_image(self):
+        """Метод класса который разделяет pdf файл на изображения формата png"""
         if os.path.exists(self.dir_name):
             with fitz.open(os.path.join(self.dir_name, 'uploaded_file.pdf')) as doc:
                 total_pages_file = len(doc)
@@ -28,6 +29,7 @@ dir_name = create_app.dir_name
 
 @app.route('/add_file', methods=['POST', 'GET'])
 def upload_file():
+    """Роутер который принимает файл и сохраняет его в директорию photos, далее вызывает метод нарезки файла"""
     if request.method == 'GET':
         return "Wait for add files"
     elif request.method == 'POST':
@@ -41,6 +43,7 @@ def upload_file():
 
 @app.route('/send_images_list', methods=['GET'])
 def send_images_list():
+    """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее кол-ство файлов"""
     if os.path.exists(dir_name):
         images = [f'http://127.0.0.1:9990/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
         return jsonify({'images': images, 'total_pages': create_app.total_pages})
@@ -48,6 +51,7 @@ def send_images_list():
 
 @app.route('/delete_files', methods=['DELETE', 'GET'])
 def delete_files():
+    """Роутер который удаляет файлы с сервера"""
     if request.method == 'GET':
         return 'Wait for delete files'
     elif request.method == 'DELETE':
@@ -68,6 +72,7 @@ def delete_success():
 
 @app.route('/photos/<path:filename>')
 def get_photo(filename):
+    """Роутер который отображает изображения с нарезанного pdf"""
     return send_from_directory('photos', filename)
 
 
