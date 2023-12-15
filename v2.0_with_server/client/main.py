@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import time
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog, QWidget, QLabel, QScrollArea, QComboBox
 from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
@@ -57,9 +56,11 @@ class Ui_MainWindow(object):
         main_window.closeEvent = self.close_event
 
     def update_page_label(self):
+        """Метод который обновляет лейбл с отображением количества страниц и текущей страницы"""
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 
     def handle_menu_option(self, option):
+        """Метод QComboBox разделения кнопок и вызываемых ими других методов"""
         if option == "Открыть файл":
             self.open_file_dialog()
         elif option == "Сохранить страницу как картинку":
@@ -68,6 +69,7 @@ class Ui_MainWindow(object):
             self.save_page_as_text()
 
     def request_url(self, router, method, **kwargs):
+        """Метод запроса на сервер в зависимости от передаваемых параметров"""
         url = os.path.join(self.server_socket, router)
         if method == 'get':
             response = requests.get(url)
@@ -84,6 +86,7 @@ class Ui_MainWindow(object):
             return f'Error {method} {router}: {response.status_code}'
 
     def close_event(self, event):
+        """Метод удаления файлов на сервере при закрытии приложения"""
         try:
             self.request_url('delete_files', 'delete')
         except ConnectionError as ex:
@@ -91,6 +94,7 @@ class Ui_MainWindow(object):
         event.accept()
 
     def open_file_dialog(self):
+        """Метод который отправялет файл на сервер, а потом показывает изображения с сервера"""
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
@@ -121,6 +125,7 @@ class Ui_MainWindow(object):
         pass
 
     def show_previous_page(self):
+        """Метод который показывает предыдущую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
@@ -133,6 +138,7 @@ class Ui_MainWindow(object):
             self.update_page_label()
 
     def show_next_page(self):
+        """Метод который показывает следующую страниу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
@@ -145,6 +151,7 @@ class Ui_MainWindow(object):
             self.update_page_label()
 
     def show_image(self, image_url):
+        """Метод отображения страниц"""
         pixmap = QPixmap()
         pixmap.loadFromData(requests.get(image_url).content)
         self.imgBrowser.setPixmap(pixmap)
@@ -156,18 +163,21 @@ class Ui_MainWindow(object):
         main_window.setWindowTitle(_translate("MainWindow", "PDF Reader"))
 
     def mouse_press(self, event):
+        """Метод начала рисования прямоугольника при нажатии левой клавишей мыши"""
         if self.image_loaded:
             if event.button() == Qt.LeftButton:
                 self.start_pos = event.pos()
                 self.end_pos = event.pos()
 
     def mouse_release(self, event):
+        """Метод конца рисования прямоугольника при нажатии правой клавишей мыши"""
         if self.image_loaded:
             if event.button() == Qt.RightButton:
                 self.end_pos = event.pos()
                 self.draw_rectangle()
 
     def draw_rectangle(self):
+        """Метод рисования прямоугольника"""
         if self.start_pos and self.end_pos:
             painter = QPainter(self.imgBrowser.pixmap())
             painter.setPen(QPen(QColor("red"), 4))
