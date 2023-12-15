@@ -97,26 +97,20 @@ class Ui_MainWindow(object):
         if file_path:
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
-                # Отправляем файл на сервер
                 try:
                     self.request_url('add_file', 'post', files=files)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
-                # time.sleep(2)
-            # Запрос к серверу на 1-ю картинку
                 try:
                     response = self.request_url('send_images', 'get')
                     images = response.json()['images']
                     self.images = images
-                    print("123", self.images)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
-
-            self.show_image(self.images[0])
-            print("Image", self.images[0])
-            self.current_page = 0  # обновляем количество страниц
-            self.update_page_label()  #обновляем лейбл
-            self.image_loaded = True # устанавливаем флаг что файл загружен
+            self.show_image(self.images[1])
+            self.current_page = 0
+            self.update_page_label()
+            self.image_loaded = True
 
     def save_page_as_image(self):
         pass
