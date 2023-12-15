@@ -102,12 +102,14 @@ class Ui_MainWindow(object):
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
                 try:
-                    response = self.request_url('send_images', 'get')
+                    response = self.request_url('send_images_list', 'get')
                     images = response.json()['images']
                     self.images = images
+                    server_total_pages = response.json()['total_pages']
+                    self.total_pages = server_total_pages
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
-            self.show_image(self.images[1])
+            self.show_image(self.images[0])
             self.current_page = 0
             self.update_page_label()
             self.image_loaded = True
