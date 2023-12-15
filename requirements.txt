@@ -1,3 +1,2 @@
 PyQt5==5.15.7
-PyMuPDF==1.23.7
 requests==2.31.0
