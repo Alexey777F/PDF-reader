@@ -59,14 +59,17 @@ class Ui_MainWindow(object):
         main_window.closeEvent = self.close_event
 
     def update_page_label(self):
+        """Метод который обновляет лейбл с отображением количества страниц и текущей страницы"""
         self.page_label.setText(f"Страница {self.current_page + 1}/{self.total_pages}")
 
     def close_event(self, event):
+        """Метод удаления файлов на локальной машине при закрытии приложения"""
         if os.path.exists(self.dir_name):
             shutil.rmtree(self.dir_name)
         event.accept()
 
     def open_file_dialog(self):
+        """Метод который открывает pdf, нарезает его на изображения png и отображает первое изображение"""
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
@@ -87,6 +90,7 @@ class Ui_MainWindow(object):
             self.image_loaded = True
 
     def show_previous_page(self):
+        """Метод который показывает предыдущую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
@@ -99,6 +103,7 @@ class Ui_MainWindow(object):
             self.update_page_label()
 
     def show_next_page(self):
+        """Метод который показывает следующую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
@@ -111,6 +116,7 @@ class Ui_MainWindow(object):
             self.update_page_label()
 
     def show_image(self, image_path):
+        """Метод отображения страниц"""
         pixmap = QPixmap(image_path)
         self.imgBrowser.setPixmap(pixmap)
         self.scrollArea.ensureVisible(0, 0)
@@ -120,18 +126,21 @@ class Ui_MainWindow(object):
         main_window.setWindowTitle(_translate("MainWindow", "PDF Reader"))
 
     def mouse_press(self, event):
+        """Метод начала рисования прямоугольника при нажатии левой клавишей мыши"""
         if self.image_loaded:
             if event.button() == Qt.LeftButton:
                 self.start_pos = event.pos()
                 self.end_pos = event.pos()
 
     def mouse_release(self, event):
+        """Метод конца рисования прямоугольника при нажатии правой клавишей мыши"""
         if self.image_loaded:
             if event.button() == Qt.RightButton:
                 self.end_pos = event.pos()
                 self.draw_rectangle()
 
     def draw_rectangle(self):
+        """Метод рисования прямоугольника"""
         if self.start_pos and self.end_pos:
             painter = QPainter(self.imgBrowser.pixmap())
             painter.setPen(QPen(QColor("red"), 4))
