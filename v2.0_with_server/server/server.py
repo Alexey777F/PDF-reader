@@ -43,7 +43,7 @@ def upload_file():
 
 @app.route('/send_images_list', methods=['GET'])
 def send_images_list():
-    """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее кол-ство файлов"""
+    """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее количество файлов"""
     if os.path.exists(dir_name):
         images = [f'http://127.0.0.1:9990/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
         return jsonify({'images': images, 'total_pages': create_app.total_pages})
