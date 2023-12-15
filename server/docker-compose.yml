@@ -3,6 +3,6 @@ services:
   app:
     container_name: app_container
     build:
-      context: ..
+      context: .
     ports:
      - "9990:9990"
