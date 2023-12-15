@@ -6,3 +6,14 @@ services:
       context: .
     ports:
      - "9990:9990"
+
+  nginx:
+    container_name: nginx_container
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    depends_on:
+      - app
+
