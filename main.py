@@ -129,7 +129,7 @@ class Ui_MainWindow(object):
                     self.current_page = self.total_pages - 1
                 else:
                     self.current_page -= 1
-            self.show_image(f"{self.dir_name}/outfile_{self.current_page + 1}.png")
+            self.show_image(f"{self.server_socket}/photos/outfile_{self.current_page + 1}.png")
             self.update_page_label()
 
     def show_next_page(self):
@@ -141,7 +141,7 @@ class Ui_MainWindow(object):
                     self.current_page = 0
                 else:
                     self.current_page += 1
-            self.show_image(f"{self.dir_name}/outfile_{self.current_page + 1}.png")
+            self.show_image(f"{self.server_socket}/photos/outfile_{self.current_page + 1}.png")
             self.update_page_label()
 
     def show_image(self, image_url):
