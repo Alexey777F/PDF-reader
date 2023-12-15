@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, jsonify
+from flask import Flask, request, redirect, url_for, jsonify, send_from_directory
 import os
 import fitz
 import shutil
@@ -45,7 +45,7 @@ def upload_file():
 @app.route('/send_images', methods=['GET'])
 def send_image():
     if os.path.exists(dir_name):
-        images = [f'{dir_name}/outfile_{i + 1}' for i in range(create_app.total_pages)]
+        images = [f'http://127.0.0.1:9990/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
         return jsonify({'images': images})
 
 
@@ -66,6 +66,9 @@ def success_uploaded():
 def delete_success():
     return 'Files deleted successfully'
 
+@app.route('/photos/<path:filename>')
+def get_photo(filename):
+    return send_from_directory('photos', filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9990)
