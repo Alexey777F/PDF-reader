@@ -20,9 +20,6 @@ class ServerBack():
                     output = f'outfile_{i + 1}.png'
                     pix.save(os.path.join(self.dir_name, output))
 
-    def send_files_to_client(self):
-        if os.path.exists(self.dir_name):
-            pass
 
 create_app = ServerBack()
 app = create_app.app
@@ -42,11 +39,11 @@ def upload_file():
         return redirect(url_for('success_uploaded'))
 
 
-@app.route('/send_images', methods=['GET'])
-def send_image():
+@app.route('/send_images_list', methods=['GET'])
+def send_images_list():
     if os.path.exists(dir_name):
         images = [f'http://127.0.0.1:9990/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
-        return jsonify({'images': images})
+        return jsonify({'images': images, 'total_pages': create_app.total_pages})
 
 
 @app.route('/delete_files', methods=['DELETE', 'GET'])
@@ -58,17 +55,21 @@ def delete_files():
             shutil.rmtree(dir_name)
             return redirect(url_for('delete_success'))
 
+
 @app.route('/success_uploaded')
 def success_uploaded():
     return 'File uploaded successfully'
+
 
 @app.route('/delete_success')
 def delete_success():
     return 'Files deleted successfully'
 
+
 @app.route('/photos/<path:filename>')
 def get_photo(filename):
     return send_from_directory('photos', filename)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9990)
