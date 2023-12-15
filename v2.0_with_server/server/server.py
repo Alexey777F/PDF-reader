@@ -3,7 +3,8 @@ import os
 import fitz
 import shutil
 
-class ServerBack():
+
+class ServerBack:
     def __init__(self):
         self.app = Flask(__name__)
         self.dir_name = "photos"
@@ -25,6 +26,8 @@ class ServerBack():
 create_app = ServerBack()
 app = create_app.app
 dir_name = create_app.dir_name
+host = os.getenv("HOST")
+port = os.getenv("PORT")
 
 
 @app.route('/add_file', methods=['POST', 'GET'])
@@ -45,7 +48,7 @@ def upload_file():
 def send_images_list():
     """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее количество файлов"""
     if os.path.exists(dir_name):
-        images = [f'http://127.0.0.1:9990/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
+        images = [f'http://{host}:{port}/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
         return jsonify({'images': images, 'total_pages': create_app.total_pages})
 
 
@@ -77,4 +80,4 @@ def get_photo(filename):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9990)
+    app.run(host=host, port=port)
