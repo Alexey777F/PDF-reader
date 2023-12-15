@@ -94,7 +94,7 @@ class Ui_MainWindow(object):
         event.accept()
 
     def open_file_dialog(self):
-        """Метод который отправялет файл на сервер, а потом показывает изображения с сервера"""
+        """Метод который отправляет файл на сервер, а потом показывает изображения с сервера"""
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file_path, _ = QFileDialog.getOpenFileName(None, "Выберите PDF файл", "", "PDF Files (*.pdf)", options=options)
@@ -138,7 +138,7 @@ class Ui_MainWindow(object):
             self.update_page_label()
 
     def show_next_page(self):
-        """Метод который показывает следующую страниу"""
+        """Метод который показывает следующую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
