@@ -26,8 +26,8 @@ class ServerBack:
 create_app = ServerBack()
 app = create_app.app
 dir_name = create_app.dir_name
-host = os.getenv("HOST")
-port = os.getenv("PORT")
+host = "0.0.0.0"
+port = 9990
 
 
 @app.route('/add_file', methods=['POST', 'GET'])
