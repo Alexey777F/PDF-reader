@@ -41,6 +41,7 @@ class Ui_MainWindow(object):
 
         self.menu_button.activated[str].connect(self.handle_menu_option)
 
+        self.images = []
         self.server_socket = 'http://127.0.0.1:9990'
         self.current_page = 0
         self.total_pages = 0
@@ -49,7 +50,6 @@ class Ui_MainWindow(object):
         self.button_forward.clicked.connect(self.show_next_page)
         self.start_pos = None
         self.end_pos = None
-
 
         self.imgBrowser.mousePressEvent = self.mouse_press
         self.imgBrowser.mouseReleaseEvent = self.mouse_release
@@ -74,7 +74,6 @@ class Ui_MainWindow(object):
         elif method == 'post':
             files = kwargs.pop('files', None)
             response = requests.post(url, files=files)
-            print(url, files)
         elif method == 'delete':
             response = requests.delete(url)
         else:
@@ -82,8 +81,7 @@ class Ui_MainWindow(object):
         if response.status_code == 200:
             return response
         else:
-            print(f'Error {method} {router}: {response.status_code}')
-            return None
+            return f'Error {method} {router}: {response.status_code}'
 
     def close_event(self, event):
         try:
@@ -99,26 +97,26 @@ class Ui_MainWindow(object):
         if file_path:
             with open(file_path, 'rb') as fp:
                 files = {'file': fp}
+                # Отправляем файл на сервер
                 try:
                     self.request_url('add_file', 'post', files=files)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
-                time.sleep(2)
+                # time.sleep(2)
             # Запрос к серверу на 1-ю картинку
                 try:
                     response = self.request_url('send_images', 'get')
                     images = response.json()['images']
-                    return images
+                    self.images = images
+                    print("123", self.images)
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
 
-            #
-            # images = response.json()['images']
-            # print('open_file_dialog', images)
-            # self.show_image(f"{self.dir_name}/outfile_1.png")
-            # self.current_page = 0  # обновляем количество страниц
-            # self.update_page_label()  #обновляем лейбл
-            # self.image_loaded = True # устанавливаем флаг что файл загружен
+            self.show_image(self.images[0])
+            print("Image", self.images[0])
+            self.current_page = 0  # обновляем количество страниц
+            self.update_page_label()  #обновляем лейбл
+            self.image_loaded = True # устанавливаем флаг что файл загружен
 
     def save_page_as_image(self):
         pass
@@ -150,10 +148,12 @@ class Ui_MainWindow(object):
             self.show_image(f"{self.dir_name}/outfile_{self.current_page + 1}.png")
             self.update_page_label()
 
-    def show_image(self, image_path):
-        pixmap = QPixmap(image_path)
+    def show_image(self, image_url):
+        pixmap = QPixmap()
+        pixmap.loadFromData(requests.get(image_url).content)
         self.imgBrowser.setPixmap(pixmap)
         self.scrollArea.ensureVisible(0, 0)
+
 
     def retranslate_ui(self, main_window):
         _translate = QCoreApplication.translate
