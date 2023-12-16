@@ -29,5 +29,5 @@
 ## Как работает - How does it works
   * Примеры работы приложения
   * Application examples
-
+![PDF-reader](https://github.com/Alexey777F/PDF-reader/blob/main/PDF-reader.gif)
 
