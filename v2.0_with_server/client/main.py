@@ -91,7 +91,6 @@ class UiMainWindow(object):
             print(f'Error {method} {router}: {response.status_code}')
             return None
 
-
     def close_event(self, event):
         """Метод удаления файлов на сервере при закрытии приложения"""
         if self.image_loaded:
