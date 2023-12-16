@@ -5,6 +5,27 @@
 
 ![PDF-reader](https://github.com/Alexey777F/PDF-reader/blob/main/PDF-reader-screen.png)
 
+## Описание - description
+ * Приложение для чтения pdf файлов.
+ * Возможность нарисовать прямоугольник красного цвета - Лкм в точку где хотите начать рисовать прямоугольник, далее Пкм в точку где хотите завершить рисование
+ * Перелистывание организовано в формате "карусели", при нажатии на кнопку назад на первой странице - отображается последняя и наоборот если на последней нажать вперед - отобразится первая страница
+ * Возможность сохранить изображение текущей отображаемой страницы в формате png
+ * Версия 2.0 что нового:
+   - Логика разделения pdf файла добавлена на сервер
+   - Добавлен сервер NGINX который проксирует все запросы от приложения на сервер
+   - Добавлена возможность сохранить изображение текущей отображаемой страницы в формате png
+   - Добавлен docker-compose.yml и Dockerfile для установки серверов, библиотек и логики в контейнеры
+ ___
+ * Application for reading pdf files.
+ * Ability to draw a red rectangle - LMB at the point where you want to start drawing the rectangle, then RMB at the point where you want to finish drawing
+ * Flipping is organized in a “carousel” format; when you press the back button on the first page, the last page is displayed, and vice versa, if you press forward on the last page, the first page is displayed
+ * Ability to save the image of the currently displayed page in png format
+ * Version 2.0 what's new:
+   - Logic for splitting a pdf file has been added to the server
+   - Added NGINX server that proxies all requests from the application to the server
+   - Added the ability to save the image of the currently displayed page in png format
+   - Added docker-compose.yml and Dockerfile for installing servers, libraries and logic in containers
+
 ## Технологии - Technologies
  * Docker-compose
  * Python(docker image): 3.9.18-bullseye
