@@ -94,11 +94,12 @@ class UiMainWindow(object):
 
     def close_event(self, event):
         """Метод удаления файлов на сервере при закрытии приложения"""
-        try:
-            self.request_url('delete_files', 'delete')
-        except ConnectionError as ex:
-            return f"Ошибка подключения к серверу, {ex}"
-        event.accept()
+        if self.image_loaded:
+            try:
+                self.request_url('delete_files', 'delete')
+            except ConnectionError as ex:
+                return f"Ошибка подключения к серверу, {ex}"
+            event.accept()
 
     def open_file_dialog(self):
         """Метод который отправляет файл на сервер, а потом показывает изображения с сервера"""
