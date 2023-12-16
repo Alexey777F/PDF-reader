@@ -1,8 +1,8 @@
-from flask import Flask, request, redirect, url_for, jsonify, send_from_directory
+from flask import Flask, request, redirect, url_for, jsonify, send_from_directory, send_file
 import os
 import fitz
 import shutil
-
+import io
 
 class ServerBack:
     def __init__(self):
@@ -61,6 +61,18 @@ def delete_files():
         if os.path.exists(dir_name):
             shutil.rmtree(dir_name)
             return redirect(url_for('delete_success'))
+
+
+@app.route('/save_image', methods=['POST'])
+def save_image():
+    """Роутер для сохранения изображения"""
+    data = request.get_json()
+    image_name = data['image_name']
+    print(image_name)
+    image_path = os.path.join(dir_name, image_name)
+    with open(image_path, 'rb') as f:
+        image_content = f.read()
+    return send_file(io.BytesIO(image_content), as_attachment=True, mimetype='image/png', download_name=image_name)
 
 
 @app.route('/success_uploaded')
