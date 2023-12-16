@@ -2,7 +2,7 @@
  * Описание 
  ___
  * Decription
-   
+![PDF-reader](https://github.com/Alexey777F/PDF-reader/blob/main/PDF-reader-screen.png)
 ## Технологии - Technologies
  * Docker-compose
  * Python(image): 3.9.18-bullseye
