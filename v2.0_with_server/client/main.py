@@ -74,8 +74,12 @@ class Ui_MainWindow(object):
         if method == 'get':
             response = requests.get(url)
         elif method == 'post':
-            files = kwargs.pop('files', None)
-            response = requests.post(url, files=files)
+            if 'files' in kwargs:
+                files = kwargs.pop('files', None)
+                response = requests.post(url, files=files)
+            else:
+                json_data = kwargs.pop('json', None)
+                response = requests.post(url, json=json_data)
         elif method == 'delete':
             response = requests.delete(url)
         else:
@@ -83,7 +87,9 @@ class Ui_MainWindow(object):
         if response.status_code == 200:
             return response
         else:
-            return f'Error {method} {router}: {response.status_code}'
+            print(f'Error {method} {router}: {response.status_code}')
+            return None
+
 
     def close_event(self, event):
         """Метод удаления файлов на сервере при закрытии приложения"""
@@ -119,7 +125,17 @@ class Ui_MainWindow(object):
             self.image_loaded = True
 
     def save_page_as_image(self):
-        pass
+        image_name = f'outfile_{self.current_page + 1}.png'
+        response = self.request_url('save_image', 'post', json={'image_name': image_name})
+        if response:
+            with open('saved_image.png', 'wb') as f:
+                f.write(response.content)
+        else:
+            print('Failed to save image')
+        # json = {'image_name': f'outfile_{self.current_page + 1}.png'}
+        # response = self.request_url('save_image', 'post', json=json)
+        # with open('saved_image.png', 'wb') as f:
+        #     f.write(response.content)
 
     def save_page_as_text(self):
         pass
