@@ -126,13 +126,14 @@ class UiMainWindow(object):
             self.image_loaded = True
 
     def save_page_as_image(self):
-        image_name = f'outfile_{self.current_page + 1}.png'
-        response = self.request_url('save_image', 'post', json={'image_name': image_name})
-        if response:
-            with open(f'saved_image{self.current_page + 1}.png', 'wb') as f:
-                f.write(response.content)
-        else:
-            print('Failed to save image')
+        if self.image_loaded:
+            image_name = f'outfile_{self.current_page + 1}.png'
+            response = self.request_url('save_image', 'post', json={'image_name': image_name})
+            if response:
+                with open(f'saved_image{self.current_page + 1}.png', 'wb') as f:
+                    f.write(response.content)
+            else:
+                print('Failed to save image')
 
     def save_page_as_text(self):
         pass
