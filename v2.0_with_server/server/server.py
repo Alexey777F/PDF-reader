@@ -68,7 +68,6 @@ def save_image():
     """Роутер для сохранения изображения"""
     data = request.get_json()
     image_name = data['image_name']
-    print(image_name)
     image_path = os.path.join(dir_name, image_name)
     with open(image_path, 'rb') as f:
         image_content = f.read()
