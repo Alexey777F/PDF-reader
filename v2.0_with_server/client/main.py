@@ -5,7 +5,8 @@ from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 import requests
 import os
 
-class Ui_MainWindow(object):
+
+class UiMainWindow(object):
     def setup_ui(self, main_window):
         main_window.setObjectName("MainWindow")
         main_window.setFixedSize(920, 780)
@@ -128,14 +129,10 @@ class Ui_MainWindow(object):
         image_name = f'outfile_{self.current_page + 1}.png'
         response = self.request_url('save_image', 'post', json={'image_name': image_name})
         if response:
-            with open('saved_image.png', 'wb') as f:
+            with open(f'saved_image{self.current_page + 1}.png', 'wb') as f:
                 f.write(response.content)
         else:
             print('Failed to save image')
-        # json = {'image_name': f'outfile_{self.current_page + 1}.png'}
-        # response = self.request_url('save_image', 'post', json=json)
-        # with open('saved_image.png', 'wb') as f:
-        #     f.write(response.content)
 
     def save_page_as_text(self):
         pass
@@ -207,7 +204,7 @@ if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
     main_window = QMainWindow()
-    ui = Ui_MainWindow()
+    ui = UiMainWindow()
     ui.setup_ui(main_window)
     main_window.show()
     sys.exit(app.exec_())
