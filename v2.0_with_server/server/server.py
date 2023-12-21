@@ -5,27 +5,27 @@ import shutil
 import io
 
 class ServerBack:
-    def __init__(self):
-        self.app = Flask(__name__)
-        self.dir_name = "photos"
-        self.total_pages = 0
+    app = Flask(__name__)
+    dir_name = "photos"
+    total_pages = 0
 
-    def convert_to_image(self):
+    @classmethod
+    def convert_to_image(cls):
         """Метод класса который разделяет pdf файл на изображения формата png"""
-        if os.path.exists(self.dir_name):
-            with fitz.open(os.path.join(self.dir_name, 'uploaded_file.pdf')) as doc:
+        if os.path.exists(cls.dir_name):
+            with fitz.open(os.path.join(cls.dir_name, 'uploaded_file.pdf')) as doc:
                 total_pages_file = len(doc)
-                self.total_pages = total_pages_file
+                cls.total_pages = total_pages_file
                 for i in range(len(doc)):
                     page = doc.load_page(i)
                     pix = page.get_pixmap(dpi=110)
                     output = f'outfile_{i + 1}.png'
-                    pix.save(os.path.join(self.dir_name, output))
+                    pix.save(os.path.join(cls.dir_name, output))
 
 
-create_app = ServerBack()
-app = create_app.app
-dir_name = create_app.dir_name
+app = ServerBack.app
+dir_name = ServerBack.dir_name
+total_pages = ServerBack.total_pages
 host = "0.0.0.0"
 port = 9990
 
@@ -40,7 +40,7 @@ def upload_file():
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
         file.save(os.path.join(dir_name, 'uploaded_file.pdf'))
-        create_app.convert_to_image()
+        ServerBack.convert_to_image()
         return redirect(url_for('success_uploaded'))
 
 
@@ -48,8 +48,8 @@ def upload_file():
 def send_images_list():
     """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее количество файлов"""
     if os.path.exists(dir_name):
-        images = [f'http://{host}:{port}/{dir_name}/outfile_{i + 1}.png' for i in range(create_app.total_pages)]
-        return jsonify({'images': images, 'total_pages': create_app.total_pages})
+        images = [f'http://{host}:{port}/{dir_name}/outfile_{i + 1}.png' for i in range(total_pages)]
+        return jsonify({'images': images, 'total_pages': total_pages})
 
 
 @app.route('/delete_files', methods=['DELETE', 'GET'])
