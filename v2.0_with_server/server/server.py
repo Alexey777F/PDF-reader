@@ -8,6 +8,8 @@ class ServerBack:
     app = Flask(__name__)
     dir_name = "photos"
     total_pages = 0
+    host = "0.0.0.0"
+    port = 9990
 
     @classmethod
     def convert_to_image(cls):
@@ -26,8 +28,8 @@ class ServerBack:
 app = ServerBack.app
 dir_name = ServerBack.dir_name
 total_pages = ServerBack.total_pages
-host = "0.0.0.0"
-port = 9990
+host = ServerBack.host
+port = ServerBack.port
 
 
 @app.route('/add_file', methods=['POST', 'GET'])
