@@ -3,27 +3,40 @@ import os
 import fitz
 import shutil
 import io
+import logging
+
+logger = logging.getLogger('my_logger')
+logger.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler('server.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 class ServerBack:
     app = Flask(__name__)
-    dir_name = "photos"
+    dir_name = 'photos'
     total_pages = 0
-    host = "0.0.0.0"
+    host = '0.0.0.0'
     port = 9990
 
     @classmethod
     def convert_to_image(cls):
         """Метод класса который разделяет pdf файл на изображения формата png"""
         if os.path.exists(cls.dir_name):
-            with fitz.open(os.path.join(cls.dir_name, 'uploaded_file.pdf')) as doc:
-                total_pages_file = len(doc)
-                cls.total_pages = total_pages_file
-                for i in range(len(doc)):
-                    page = doc.load_page(i)
-                    pix = page.get_pixmap(dpi=110)
-                    output = f'outfile_{i + 1}.png'
-                    pix.save(os.path.join(cls.dir_name, output))
+            try:
+                with fitz.open(os.path.join(cls.dir_name, 'uploaded_file.pdf')) as doc:
+                    total_pages_file = len(doc)
+                    cls.total_pages = total_pages_file
+                    for i in range(len(doc)):
+                        page = doc.load_page(i)
+                        pix = page.get_pixmap(dpi=110)
+                        output = f'outfile_{i + 1}.png'
+                        pix.save(os.path.join(cls.dir_name, output))
+            except FileNotFoundError:
+                logger.error('Файл не найден')
+            except Exception as ex:
+                logger.error(f'Ошибка при чтении файла, {ex}')
 
 
 app = ServerBack.app
@@ -36,7 +49,7 @@ port = ServerBack.port
 def upload_file():
     """Роутер который принимает файл и сохраняет его в директорию photos, далее вызывает метод нарезки файла"""
     if request.method == 'GET':
-        return "Wait for add files"
+        return 'Ждем добавления файлов'
     elif request.method == 'POST':
         file = request.files['file']
         if not os.path.exists(dir_name):
@@ -44,6 +57,11 @@ def upload_file():
         file.save(os.path.join(dir_name, 'uploaded_file.pdf'))
         ServerBack.convert_to_image()
         return redirect(url_for('success_uploaded'))
+
+
+@app.route('/check_server', methods=['GET'])
+def check_server():
+    return 'Сервер запущен'
 
 
 @app.route('/send_images_list', methods=['GET'])
@@ -67,12 +85,15 @@ def delete_files():
 
 @app.route('/save_image', methods=['POST'])
 def save_image():
-    """Роутер для сохранения изображения"""
+    """Роутер для отправки изображения клиенту"""
     data = request.get_json()
     image_name = data['image_name']
     image_path = os.path.join(dir_name, image_name)
-    with open(image_path, 'rb') as f:
-        image_content = f.read()
+    try:
+        with open(image_path, 'rb') as f:
+            image_content = f.read()
+    except Exception as ex:
+        logger.error(f'Ошибка при чтении файла, {ex}')
     return send_file(io.BytesIO(image_content), as_attachment=True, mimetype='image/png', download_name=image_name)
 
 
