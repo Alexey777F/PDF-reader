@@ -4,6 +4,7 @@ import fitz
 import shutil
 import io
 
+
 class ServerBack:
     app = Flask(__name__)
     dir_name = "photos"
@@ -27,7 +28,6 @@ class ServerBack:
 
 app = ServerBack.app
 dir_name = ServerBack.dir_name
-total_pages = ServerBack.total_pages
 host = ServerBack.host
 port = ServerBack.port
 
@@ -50,8 +50,8 @@ def upload_file():
 def send_images_list():
     """Роутер который в ответ на get запрос клиента присылает ему список url картинок и общее количество файлов"""
     if os.path.exists(dir_name):
-        images = [f'http://{host}:{port}/{dir_name}/outfile_{i + 1}.png' for i in range(total_pages)]
-        return jsonify({'images': images, 'total_pages': total_pages})
+        images = [f'http://{host}:{port}/{dir_name}/outfile_{i + 1}.png' for i in range(ServerBack.total_pages)]
+        return jsonify({'images': images, 'total_pages': ServerBack.total_pages})
 
 
 @app.route('/delete_files', methods=['DELETE', 'GET'])
@@ -89,7 +89,7 @@ def delete_success():
 @app.route('/photos/<path:filename>')
 def get_photo(filename):
     """Роутер который отображает изображения с нарезанного pdf"""
-    return send_from_directory('photos', filename)
+    return send_from_directory(dir_name, filename)
 
 
 if __name__ == '__main__':
