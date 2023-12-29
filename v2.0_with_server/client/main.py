@@ -18,7 +18,6 @@ class UiMainWindow(object):
         self.menu_button.addItem("Меню")
         self.menu_button.addItem("Открыть файл")
         self.menu_button.addItem("Сохранить страницу как картинку")
-        self.menu_button.addItem("Сохранить страницу как текст")
 
         self.page_label = QLabel(self.centralwidget)
         self.page_label.setGeometry(400, 10, 120, 35)
@@ -66,8 +65,7 @@ class UiMainWindow(object):
             self.open_file_dialog()
         elif option == "Сохранить страницу как картинку":
             self.save_page_as_image()
-        elif option == "Сохранить страницу как текст":
-            self.save_page_as_text()
+
 
     def request_url(self, router, method, **kwargs):
         """Метод запроса на сервер в зависимости от передаваемых параметров"""
@@ -120,6 +118,7 @@ class UiMainWindow(object):
                     self.total_pages = server_total_pages
                 except ConnectionError as ex:
                     return f"Ошибка подключения к серверу, {ex}"
+
             self.show_image(self.images[0])
             self.current_page = 0
             self.update_page_label()
@@ -134,9 +133,6 @@ class UiMainWindow(object):
                     f.write(response.content)
             else:
                 print('Failed to save image')
-
-    def save_page_as_text(self):
-        pass
 
     def show_previous_page(self):
         """Метод который показывает предыдущую страницу"""
@@ -170,7 +166,6 @@ class UiMainWindow(object):
         pixmap.loadFromData(requests.get(image_url).content)
         self.imgBrowser.setPixmap(pixmap)
         self.scrollArea.ensureVisible(0, 0)
-
 
     def retranslate_ui(self, main_window):
         _translate = QCoreApplication.translate
