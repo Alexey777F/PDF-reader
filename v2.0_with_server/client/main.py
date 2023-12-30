@@ -63,7 +63,7 @@ class UiMainWindow(object):
         main_window.closeEvent = self.close_event
 
     def update_page_label(self):
-        """Метод который обновляет лейбл с отображением количества страниц и текущей страницы"""
+        """Метод, который обновляет лейбл с отображением количества страниц и текущей страницы"""
         self.page_label.setText(f'Страница {self.current_page + 1}/{self.total_pages}')
 
     def handle_menu_option(self, option):
@@ -115,7 +115,7 @@ class UiMainWindow(object):
         event.accept()
 
     def open_file_dialog(self):
-        """Метод который отправляет файл на сервер, а потом показывает изображения с сервера"""
+        """Метод, который отправляет файл на сервер, а потом показывает изображения с сервера"""
         if not self.is_server_available():
             QMessageBox.warning(None, "Сервер недоступен", "Сервер недоступен. Попробуйте позже.")
             return
@@ -160,7 +160,7 @@ class UiMainWindow(object):
             return
 
     def show_previous_page(self):
-        """Метод который показывает предыдущую страницу"""
+        """Метод, который показывает предыдущую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
@@ -173,7 +173,7 @@ class UiMainWindow(object):
             self.update_page_label()
 
     def show_next_page(self):
-        """Метод который показывает следующую страницу"""
+        """Метод, который показывает следующую страницу"""
         if self.image_loaded:
             if self.total_pages == 1:
                 self.current_page = 0
