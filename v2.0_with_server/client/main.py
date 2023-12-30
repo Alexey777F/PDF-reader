@@ -146,6 +146,7 @@ class UiMainWindow(object):
                 logger.error(f'Произошла ошибка: {e}')
 
     def save_page_as_image(self):
+        """Метод сохранения изображения которое прислал сервер"""
         if self.image_loaded and self.is_server_available():
             image_name = f'outfile_{self.current_page + 1}.png'
             response = self.request_url('save_image', 'post', json={'image_name': image_name})
